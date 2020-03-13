@@ -57,8 +57,24 @@ def test_get_not_found(context):
 
 
 def test_delete(context, post_event):
+    priv_id = post_event.json['priv_id']
     ext_id = post_event.json['ext_id']
-    response = app.test_client().delete(f'/events/{ext_id}')
+    response = app.test_client().delete(f'/events/{priv_id}')
     assert response.status_code == 204
     response = app.test_client().get(f'/events/{ext_id}')
     assert response.status_code == 404
+
+
+def test_update(context, post_event):
+    priv_id = post_event.json['priv_id']
+    ext_id = post_event.json['ext_id']
+    response = app.test_client().put(f'/events/{priv_id}', json={
+        "title": "Event 2",
+        "descr": "Event 1 descr",
+        "dt": "2020-10-01 18:00",
+        "address": "Street, 1"
+    })
+    assert response.status_code == 200
+    response = app.test_client().get(f'/events/{ext_id}')
+    assert response.status_code == 200
+    assert response.json['title'] == 'Event 2'
